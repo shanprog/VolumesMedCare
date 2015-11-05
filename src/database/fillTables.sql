@@ -174,3 +174,12 @@ INSERT INTO mo_list VALUES
   (NULL, 280115, 'ФГБУ "НИИТО ИМ.Я.Л. ЦИВЬЯНА" МИНЗДРАВА РОССИИ', 999, 0),
   (NULL, 280116, 'ООО "АМУР ТЕСТ"', 24, 1),
   (NULL, 280117, 'ООО"Нефролайн-Амур"', 25, 1);
+
+
+INSERT INTO roles VALUES
+  (NULL, 'Администратор'),
+  (NULL, 'Пользователь');
+
+INSERT IGNORE INTO users VALUES
+  (NULL, 'Administrator', '35dba5d75538a9bbe0b4da4422759a0e','Администратор', 1, 1),
+  (NULL, 'User1', '35dba5d75538a9bbe0b4da4422759a0e','Пользователь', 2, 1);

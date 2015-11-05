@@ -1,10 +1,16 @@
+import controller.FrameLoginController;
 import controller.FrameMainController;
 
 public class Main {
 
     public static void main(String[] args) {
 
-        new FrameMainController();
+
+        FrameLoginController frameLoginController = new FrameLoginController();
+
+
+
+//        new FrameMainController();
 
     }
 

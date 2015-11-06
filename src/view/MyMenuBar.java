@@ -26,5 +26,7 @@ public class MyMenuBar extends JMenuBar {
         itemExit.addActionListener(a);
     }
 
-
+    public void setItemLoadAction(ActionListener a) {
+        itemLoad.addActionListener(a);
+    }
 }

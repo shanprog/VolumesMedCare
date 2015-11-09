@@ -91,3 +91,14 @@ CREATE TABLE IF NOT EXISTS offers_smp (
   FOREIGN KEY (id_mo) REFERENCES mo_list (id_mo),
   FOREIGN KEY (id_profile) REFERENCES profiles (id_profile)
 );
+
+CREATE TABLE IF NOT EXISTS offers_other (
+  id_other     INT AUTO_INCREMENT,
+  id_mo      INT,
+  id_profile INT,
+  offer      INT,
+  year       INT,
+  PRIMARY KEY (id_other),
+  FOREIGN KEY (id_mo) REFERENCES mo_list (id_mo),
+  FOREIGN KEY (id_profile) REFERENCES profiles (id_profile)
+);

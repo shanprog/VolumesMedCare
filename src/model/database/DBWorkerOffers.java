@@ -48,17 +48,17 @@ public class DBWorkerOffers {
 
             idMo = getIdMo();
 
-//            process_24h(idMo, queries);
-//            process_8h(idMo, queries);
+            process_24h(idMo, queries);
+            process_8h(idMo, queries);
             process_ambul(idMo, queries);
-//            process_smp(idMo, queries);
+            process_smp(idMo, queries);
+            process_other(idMo, queries);
 
+//            for (String q : queries) {
+//                System.out.println(q);
+//            }
 
-            for (String q : queries) {
-                System.out.println(q);
-            }
-
-//            runQueries(queries);
+            runQueries(queries);
 
         } catch (IOException ioException) {
             JOptionPane.showMessageDialog(null, "Файл не может быть прочитан. " + ioException.toString());
@@ -71,7 +71,7 @@ public class DBWorkerOffers {
         return true;
     }
 
-    private int getIdMo() {
+    public int getIdMo() {
         sheet = wb.getSheetAt(0);
         row = sheet.getRow(6);
         cell = row.getCell(0);
@@ -138,6 +138,8 @@ public class DBWorkerOffers {
         sheet = wb.getSheetAt(2);
         queries.add(String.format("DELETE FROM offers_ambul WHERE id_mo = '%d' AND year='%d';", idMo, YEAR));
 
+
+        int numberOfProfile = 0;
         for (int i = 6; i < 37; i++) {
 
             if (i == 33)
@@ -145,17 +147,19 @@ public class DBWorkerOffers {
 
             row = sheet.getRow(i);
 
-            System.out.println(row.getCell(1).getStringCellValue());
+            String prof = "'" + (int) row.getCell(1).getNumericCellValue() + "'";
+            String neot = "NULL";
+            String zab = "NULL";
 
-//            int prof = (int) row.getCell(1).getNumericCellValue();
-//            int neot = (int) row.getCell(3).getNumericCellValue();
-//            int zab = (int) row.getCell(5).getNumericCellValue();
-//
-//            int idprofile = Constants.planPatAmbul[i - 6];
-//
-//            queries.add(String.format("INSERT INTO offers_ambul VALUES(NULL, '%d', '%d', '%d', '%d', '%d', '%d');",
-//                    idMo, idprofile, prof, neot, zab, YEAR));
+            if (i == 36 || i < 31) {
+                neot = "'" + (int) row.getCell(3).getNumericCellValue() + "'";
+                zab = "'" + (int) row.getCell(5).getNumericCellValue() + "'";
+            }
 
+            int idprofile = Constants.planPatAmbul[numberOfProfile++];
+
+            queries.add(String.format("INSERT INTO offers_ambul VALUES(NULL, '%d', '%d', %s, %s, %s, '%d');",
+                    idMo, idprofile, prof, neot, zab, YEAR));
         }
 
         queries.add(String.format("DELETE FROM offers_ambul_uet WHERE id_mo = '%d' AND year='%d';", idMo, YEAR));
@@ -166,7 +170,7 @@ public class DBWorkerOffers {
         int neot_uet = (int) row.getCell(4).getNumericCellValue();
         int zab_uet = (int) row.getCell(6).getNumericCellValue();
 
-        int idprofile = 44;
+        int idprofile = 43;
 
         queries.add(String.format("INSERT INTO offers_ambul_uet VALUES(NULL, '%d', '%d', '%d', '%d', '%d', '%d');",
                 idMo, idprofile, prof_uet, neot_uet, zab_uet, YEAR));
@@ -191,6 +195,34 @@ public class DBWorkerOffers {
 
     }
 
+    private void process_other(int idMo, ArrayList<String> queries) {
+
+        sheet = wb.getSheetAt(4);
+        queries.add(String.format("DELETE FROM offers_other WHERE id_mo = '%d' AND year='%d';", idMo, YEAR));
+
+        int numberOfProfile = 0;
+        for (int i = 6; i < 16; i++) {
+
+            if (i == 8)
+                continue;
+
+            row = sheet.getRow(i);
+
+            int offer = 0;
+            if (i < 10) {
+                offer = (int) row.getCell(2).getNumericCellValue();
+            } else {
+                offer = (int) row.getCell(1).getNumericCellValue();
+            }
+
+
+            int idprofile = Constants.planPatOther[numberOfProfile++];
+
+            queries.add(String.format("INSERT INTO offers_other VALUES(NULL, '%d', '%d', '%d', '%d');",
+                    idMo, idprofile, offer, YEAR));
+        }
+
+    }
 
 
 }

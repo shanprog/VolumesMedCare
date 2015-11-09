@@ -224,5 +224,49 @@ public class DBWorkerOffers {
 
     }
 
+    public ArrayList<String> getNamesProfile(Constants.OffersTabs offersTabs) {
+
+        ArrayList<String> result = new ArrayList<>();
+        int[] profilesId = new int[0];
+        String table = "";
+
+        switch (offersTabs) {
+            case HOURS_24:
+                profilesId = Constants.planPatHours24;
+                table = "offers_hours_24";
+                break;
+            case HOURS_8:
+                profilesId = Constants.planPatHours8;
+                table = "offers_hours_8";
+                break;
+            case AMBUL:
+                profilesId = Constants.planPatAmbul;
+                table = "offers_ambul";
+                break;
+            case SMP:
+                profilesId = Constants.planPatSmp;
+                table = "offers_smp";
+                break;
+            case OTHER:
+                profilesId = Constants.planPatOther;
+                table = "offers_other";
+                break;
+        }
+
+        for (int i : profilesId) {
+            try {
+                resultSet = statement.executeQuery(String.format("SELECT name FROM profiles WHERE id_profile = '%d'", i));
+
+                while (resultSet.next())
+                    result.add(resultSet.getString("name"));
+
+            } catch (SQLException sqle) {
+                sqle.printStackTrace();
+            }
+        }
+
+        return result;
+    }
+
 
 }

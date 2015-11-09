@@ -3,6 +3,7 @@ package model.database;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 
 public class DBWorkerMO {
 
@@ -21,6 +22,40 @@ public class DBWorkerMO {
         }
 
         return 0;
+    }
+
+    public ArrayList<Integer> getActiveMos() {
+
+        ArrayList<Integer> result= new ArrayList<>();
+
+        try {
+            resultSet = statement.executeQuery(String.format("SELECT id_mo FROM mo_list WHERE actual = '1' ORDER BY sort"));
+
+            while (resultSet.next())
+                result.add(resultSet.getInt("id_mo"));
+
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+        }
+
+        return result;
+    }
+
+    public String getNameMO(int idMo) {
+
+        String result = "";
+
+        try {
+            resultSet = statement.executeQuery(String.format("SELECT name FROM mo_list WHERE id_mo = '%d'", idMo));
+
+            while (resultSet.next())
+                result = resultSet.getString("name");
+
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+        }
+
+        return result;
     }
 
 }

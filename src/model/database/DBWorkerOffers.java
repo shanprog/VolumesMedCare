@@ -1,6 +1,7 @@
 package model.database;
 
 import model.Constants;
+import model.Constants.OffersTabs;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -15,6 +16,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class DBWorkerOffers {
 
@@ -224,7 +227,7 @@ public class DBWorkerOffers {
 
     }
 
-    public ArrayList<String> getNamesProfile(Constants.OffersTabs offersTabs) {
+    public ArrayList<String> getNamesProfile(OffersTabs offersTabs) {
 
         ArrayList<String> result = new ArrayList<>();
         int[] profilesId = new int[0];
@@ -269,4 +272,100 @@ public class DBWorkerOffers {
     }
 
 
+    public HashMap<Integer, Integer> getValuesByProfilesFromHours24(int idMo) {
+
+        HashMap<Integer, Integer> result = new HashMap<>();
+        int[] profiles = Constants.planPatHours24;
+
+        for (int i : profiles) {
+            result.put(i, 0);
+        }
+
+
+        try {
+            resultSet = statement.executeQuery(String.format("SELECT id_profile, hosp FROM offers_hours_24 WHERE id_mo = '%d' AND year = '%d'", idMo, YEAR));
+
+            while (resultSet.next())
+                result.replace(resultSet.getInt("id_profile"), resultSet.getInt("hosp"));
+
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+        }
+
+        return result;
+
+    }
+
+    public HashMap<Integer, Integer> getValuesByProfilesFromHours8(int idMo) {
+
+        HashMap<Integer, Integer> result = new HashMap<>();
+        int[] profiles = Constants.planPatHours8;
+
+
+        for (int i : profiles) {
+            result.put(i, 0);
+        }
+
+
+        try {
+            resultSet = statement.executeQuery(String.format("SELECT id_profile, out_p FROM offers_hours_8 WHERE id_mo = '%d' AND year = '%d'", idMo, YEAR));
+
+            while (resultSet.next())
+                result.replace(resultSet.getInt("id_profile"), resultSet.getInt("out_p"));
+
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+        }
+
+        return result;
+
+    }
+
+    public HashMap<Integer, Integer> getValuesByProfilesFromSMP(int idMo) {
+
+        HashMap<Integer, Integer> result = new HashMap<>();
+        int[] profiles = Constants.planPatSmp;
+
+        for (int i : profiles) {
+            result.put(i, 0);
+        }
+
+
+        try {
+            resultSet = statement.executeQuery(String.format("SELECT id_profile, offer FROM offers_smp WHERE id_mo = '%d' AND year = '%d'", idMo, YEAR));
+
+            while (resultSet.next())
+                result.replace(resultSet.getInt("id_profile"), resultSet.getInt("offer"));
+
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+        }
+
+        return result;
+
+    }
+
+    public HashMap<Integer, Integer> getValuesByProfilesFromOther(int idMo) {
+
+        HashMap<Integer, Integer> result = new HashMap<>();
+        int[] profiles = Constants.planPatOther;
+
+        for (int i : profiles) {
+            result.put(i, 0);
+        }
+
+
+        try {
+            resultSet = statement.executeQuery(String.format("SELECT id_profile, offer FROM offers_other WHERE id_mo = '%d' AND year = '%d'", idMo, YEAR));
+
+            while (resultSet.next())
+                result.replace(resultSet.getInt("id_profile"), resultSet.getInt("offer"));
+
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+        }
+
+        return result;
+
+    }
 }

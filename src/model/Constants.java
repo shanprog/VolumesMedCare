@@ -15,7 +15,7 @@ public class Constants {
                 case HOURS_24:
                     return "Кругл.суточ. стационар";
                 case HOURS_8:
-                    return "Днев.суточ. стационар";
+                    return "Днев. стационар";
                 case AMBUL:
                     return "Амбулаторн. условия";
                 case SMP:

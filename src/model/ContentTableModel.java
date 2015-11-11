@@ -6,6 +6,7 @@ import model.database.DBWorkerOffers;
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.stream.Collectors;
 
 import static model.Constants.*;
 
@@ -32,8 +33,20 @@ public class ContentTableModel extends AbstractTableModel {
 
             case HOURS_24:
             case HOURS_8:
-            case AMBUL:
+
                 orgColumnNames();
+                columnNames.add("Итого");
+                columnNames.add("Название МО");
+
+                orgRows();
+                break;
+
+            case AMBUL_PROF:
+            case AMBUL_NEOT:
+            case AMBUL_ZAB:
+                orgColumnNames();
+
+                columnNames.add("УЕТ");
                 columnNames.add("Итого");
                 columnNames.add("Название МО");
 
@@ -75,11 +88,7 @@ public class ContentTableModel extends AbstractTableModel {
         // Организация колонок
         columnNames.add("Название МО");
 
-        for (String name : profiles) {
-            columnNames.add(name);
-        }
-
-
+        columnNames.addAll(profiles.stream().collect(Collectors.toList()));
     }
 
     private void orgRows() {
@@ -116,7 +125,43 @@ public class ContentTableModel extends AbstractTableModel {
                     row.add(sum);
                     break;
 
-                case AMBUL:
+                case AMBUL_PROF:
+                    profilesValues = dbWorkerOffers.getValuesByProfilesFromAmbul(idMo, Constants.planPatAmbulProf, "prof");
+
+                    for (int i : Constants.planPatAmbulProf) {
+                        row.add(profilesValues.get(i));
+                        sum += profilesValues.get(i);
+                    }
+
+                    row.add(dbWorkerOffers.getValuesByProfilesFromUet(idMo, "prof"));
+                    row.add(sum);
+
+                    break;
+                case AMBUL_NEOT:
+
+                    profilesValues = dbWorkerOffers.getValuesByProfilesFromAmbul(idMo, Constants.planPatAmbulNeot, "neot");
+
+                    for (int i : Constants.planPatAmbulNeot) {
+                        row.add(profilesValues.get(i));
+                        sum += profilesValues.get(i);
+                    }
+
+                    row.add(dbWorkerOffers.getValuesByProfilesFromUet(idMo, "neot"));
+                    row.add(sum);
+
+                    break;
+                case AMBUL_ZAB:
+
+                    profilesValues = dbWorkerOffers.getValuesByProfilesFromAmbul(idMo, Constants.planPatAmbulNeot, "zab");
+
+                    for (int i : Constants.planPatAmbulNeot) {
+                        row.add(profilesValues.get(i));
+                        sum += profilesValues.get(i);
+                    }
+
+                    row.add(dbWorkerOffers.getValuesByProfilesFromUet(idMo, "zab"));
+                    row.add(sum);
+
                     break;
                 case SMP:
                     profilesValues = dbWorkerOffers.getValuesByProfilesFromSMP(idMo);
@@ -193,10 +238,10 @@ public class ContentTableModel extends AbstractTableModel {
         int colCount = getColumnCount();
         int oldSum;
 
-        if (offersTabs == OffersTabs.HOURS_24 || offersTabs == OffersTabs.HOURS_8 || offersTabs == OffersTabs.AMBUL)
-            oldSum = (Integer) (data.get(rowIndex)).get(colCount - 2);
-        else
+        if (offersTabs == OffersTabs.SMP || offersTabs == OffersTabs.OTHER)
             oldSum = (Integer) (data.get(rowIndex)).get(colCount - 1);
+        else
+            oldSum = (Integer) (data.get(rowIndex)).get(colCount - 2);
 
 
         data.get(rowIndex).set(columnIndex, aValue);
@@ -260,8 +305,64 @@ public class ContentTableModel extends AbstractTableModel {
                 fireTableRowsUpdated(rowIndex, rowIndex);
 
                 break;
-            case AMBUL:
+            case AMBUL_PROF:
 
+                if (columnIndex > 0 && columnIndex < colCount - 3) {
+                    int sum = 0;
+                    for (int i = 0; i < planPatAmbulProf.length; i++) {
+                        sum += (Integer) (data.get(rowIndex)).get(i + 1);
+                    }
+
+                    data.get(rowIndex).set(colCount - 2, sum);
+                }
+
+
+                if (columnIndex == colCount - 2) {
+
+                    double k = ((Integer) (data.get(rowIndex)).get(colCount - 2)) / ((double) oldSum);
+
+                    int sum = 0;
+                    for (int i = 0; i < planPatAmbulProf.length; i++) {
+                        int newVal = (int) ((Integer) (data.get(rowIndex)).get(i + 1) * k);
+                        data.get(rowIndex).set(i + 1, newVal);
+
+                        sum += newVal;
+                    }
+
+                    data.get(rowIndex).set(columnIndex, sum);
+                }
+
+                fireTableRowsUpdated(rowIndex, rowIndex);
+                break;
+
+            case AMBUL_NEOT:
+            case AMBUL_ZAB:
+
+                if (columnIndex > 0 && columnIndex < colCount - 3) {
+                    int sum = 0;
+                    for (int i = 0; i < planPatAmbulNeot.length; i++) {
+                        sum += (Integer) (data.get(rowIndex)).get(i + 1);
+                    }
+
+                    data.get(rowIndex).set(colCount - 2, sum);
+                }
+
+                if (columnIndex == colCount - 2) {
+
+                    double k = ((Integer) (data.get(rowIndex)).get(colCount - 2)) / ((double) oldSum);
+
+                    int sum = 0;
+                    for (int i = 0; i < planPatAmbulNeot.length; i++) {
+                        int newVal = (int) ((Integer) (data.get(rowIndex)).get(i + 1) * k);
+                        data.get(rowIndex).set(i + 1, newVal);
+
+                        sum += newVal;
+                    }
+
+                    data.get(rowIndex).set(columnIndex, sum);
+                }
+
+                fireTableRowsUpdated(rowIndex, rowIndex);
                 break;
             case SMP:
 
@@ -337,13 +438,15 @@ public class ContentTableModel extends AbstractTableModel {
     public boolean isCellEditable(int rowIndex, int columnIndex) {
 
 
-        if (offersTabs == OffersTabs.HOURS_24 || offersTabs == OffersTabs.HOURS_8 || offersTabs == OffersTabs.AMBUL) {
-            if (columnIndex == 0 || columnIndex == getColumnCount() - 1) return false;
-        } else if (offersTabs == OffersTabs.SMP || offersTabs == OffersTabs.OTHER) {
+        if (offersTabs == OffersTabs.SMP || offersTabs == OffersTabs.OTHER) {
             if (columnIndex == 0) return false;
+        } else {
+            if (columnIndex == 0 || columnIndex == getColumnCount() - 1) return false;
         }
 
         return true;
+
+
     }
 
     @Override
@@ -366,7 +469,17 @@ public class ContentTableModel extends AbstractTableModel {
 
                 break;
 
-            case AMBUL:
+            case AMBUL_PROF:
+            case AMBUL_NEOT:
+            case AMBUL_ZAB:
+
+                if (columnIndex == colCount - 3)
+                    return Double.class;
+
+                for (int i = 1; i < colCount - 1; i++) {
+                    return Integer.class;
+                }
+
                 break;
 
             case SMP:
@@ -389,7 +502,6 @@ public class ContentTableModel extends AbstractTableModel {
                 }
 
         }
-
 
         return Object.class;
 

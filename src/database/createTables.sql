@@ -55,15 +55,35 @@ CREATE TABLE IF NOT EXISTS offers_hours_8 (
   FOREIGN KEY (id_profile) REFERENCES profiles (id_profile)
 );
 
-CREATE TABLE IF NOT EXISTS offers_ambul (
-  id_ambul   INT AUTO_INCREMENT,
-  id_mo      INT,
-  id_profile INT,
-  prof       INT,
-  neot       INT,
-  zab        INT,
-  year       INT,
-  PRIMARY KEY (id_ambul),
+CREATE TABLE IF NOT EXISTS offers_ambul_prof (
+  id_ambul_prof INT AUTO_INCREMENT,
+  id_mo         INT,
+  id_profile    INT,
+  offer         INT,
+  year          INT,
+  PRIMARY KEY (id_ambul_prof),
+  FOREIGN KEY (id_mo) REFERENCES mo_list (id_mo),
+  FOREIGN KEY (id_profile) REFERENCES profiles (id_profile)
+);
+
+CREATE TABLE IF NOT EXISTS offers_ambul_neot (
+  id_ambul_neot INT AUTO_INCREMENT,
+  id_mo         INT,
+  id_profile    INT,
+  offer         INT,
+  year          INT,
+  PRIMARY KEY (id_ambul_neot),
+  FOREIGN KEY (id_mo) REFERENCES mo_list (id_mo),
+  FOREIGN KEY (id_profile) REFERENCES profiles (id_profile)
+);
+
+CREATE TABLE IF NOT EXISTS offers_ambul_zab (
+  id_ambul_zab INT AUTO_INCREMENT,
+  id_mo        INT,
+  id_profile   INT,
+  offer        INT,
+  year         INT,
+  PRIMARY KEY (id_ambul_zab),
   FOREIGN KEY (id_mo) REFERENCES mo_list (id_mo),
   FOREIGN KEY (id_profile) REFERENCES profiles (id_profile)
 );
@@ -72,9 +92,9 @@ CREATE TABLE IF NOT EXISTS offers_ambul_uet (
   id_ambul_uet INT AUTO_INCREMENT,
   id_mo        INT,
   id_profile   INT,
-  prof         INT,
-  neot         INT,
-  zab          INT,
+  prof         DOUBLE,
+  neot         DOUBLE,
+  zab          DOUBLE,
   year         INT,
   PRIMARY KEY (id_ambul_uet),
   FOREIGN KEY (id_mo) REFERENCES mo_list (id_mo),
@@ -93,7 +113,7 @@ CREATE TABLE IF NOT EXISTS offers_smp (
 );
 
 CREATE TABLE IF NOT EXISTS offers_other (
-  id_other     INT AUTO_INCREMENT,
+  id_other   INT AUTO_INCREMENT,
   id_mo      INT,
   id_profile INT,
   offer      INT,

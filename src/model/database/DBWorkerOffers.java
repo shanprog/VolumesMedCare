@@ -17,7 +17,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
 public class DBWorkerOffers {
 
@@ -139,8 +138,8 @@ public class DBWorkerOffers {
     private void process_ambul(int idMo, ArrayList<String> queries) {
 
         sheet = wb.getSheetAt(2);
-        queries.add(String.format("DELETE FROM offers_ambul WHERE id_mo = '%d' AND year='%d';", idMo, YEAR));
 
+        queries.add(String.format("DELETE FROM offers_ambul_prof WHERE id_mo = '%d' AND year='%d';", idMo, YEAR));
 
         int numberOfProfile = 0;
         for (int i = 6; i < 37; i++) {
@@ -150,32 +149,48 @@ public class DBWorkerOffers {
 
             row = sheet.getRow(i);
 
-            String prof = "'" + (int) row.getCell(1).getNumericCellValue() + "'";
-            String neot = "NULL";
-            String zab = "NULL";
+            int prof = (int) row.getCell(1).getNumericCellValue();
 
-            if (i == 36 || i < 31) {
-                neot = "'" + (int) row.getCell(3).getNumericCellValue() + "'";
-                zab = "'" + (int) row.getCell(5).getNumericCellValue() + "'";
-            }
+            int idprofile = Constants.planPatAmbulProf[numberOfProfile++];
 
-            int idprofile = Constants.planPatAmbul[numberOfProfile++];
-
-            queries.add(String.format("INSERT INTO offers_ambul VALUES(NULL, '%d', '%d', %s, %s, %s, '%d');",
-                    idMo, idprofile, prof, neot, zab, YEAR));
+            queries.add(String.format("INSERT INTO offers_ambul_prof VALUES(NULL, '%d', '%d', '%d', '%d');",
+                    idMo, idprofile, prof, YEAR));
         }
+
+
+        queries.add(String.format("DELETE FROM offers_ambul_neot WHERE id_mo = '%d' AND year='%d';", idMo, YEAR));
+
+        numberOfProfile = 0;
+        for (int i = 6; i < 37; i++) {
+
+            if (i >= 31 && i<=35)
+                continue;
+
+            row = sheet.getRow(i);
+
+            int neot = (int) row.getCell(3).getNumericCellValue();
+            int zab = (int) row.getCell(5).getNumericCellValue();
+
+            int idprofile = Constants.planPatAmbulNeot[numberOfProfile++];
+
+            queries.add(String.format("INSERT INTO offers_ambul_neot VALUES(NULL, '%d', '%d', '%d', '%d');",
+                    idMo, idprofile, neot, YEAR));
+            queries.add(String.format("INSERT INTO offers_ambul_zab VALUES(NULL, '%d', '%d', '%d', '%d');",
+                    idMo, idprofile, zab, YEAR));
+        }
+
 
         queries.add(String.format("DELETE FROM offers_ambul_uet WHERE id_mo = '%d' AND year='%d';", idMo, YEAR));
 
         row = sheet.getRow(36);
 
-        int prof_uet = (int) row.getCell(2).getNumericCellValue();
-        int neot_uet = (int) row.getCell(4).getNumericCellValue();
-        int zab_uet = (int) row.getCell(6).getNumericCellValue();
+        double prof_uet = (double) row.getCell(2).getNumericCellValue();
+        double neot_uet = (double) row.getCell(4).getNumericCellValue();
+        double zab_uet = (double) row.getCell(6).getNumericCellValue();
 
         int idprofile = 43;
 
-        queries.add(String.format("INSERT INTO offers_ambul_uet VALUES(NULL, '%d', '%d', '%d', '%d', '%d', '%d');",
+        queries.add(String.format("INSERT INTO offers_ambul_uet VALUES(NULL, '%d', '%d', '%f', '%f', '%f', '%d');",
                 idMo, idprofile, prof_uet, neot_uet, zab_uet, YEAR));
     }
 
@@ -242,9 +257,15 @@ public class DBWorkerOffers {
                 profilesId = Constants.planPatHours8;
                 table = "offers_hours_8";
                 break;
-            case AMBUL:
-                profilesId = Constants.planPatAmbul;
-                table = "offers_ambul";
+            case AMBUL_PROF:
+                profilesId = Constants.planPatAmbulProf;
+                table = "offers_ambul_prof";
+                break;
+
+            case AMBUL_NEOT:
+            case AMBUL_ZAB:
+                profilesId = Constants.planPatAmbulNeot;
+                table = "offers_ambul_neot";
                 break;
             case SMP:
                 profilesId = Constants.planPatSmp;
@@ -320,6 +341,48 @@ public class DBWorkerOffers {
         return result;
 
     }
+
+    public HashMap<Integer, Integer> getValuesByProfilesFromAmbul(int idMo, int[] profiles, String name) {
+
+        HashMap<Integer, Integer> result = new HashMap<>();
+
+        for (int i : profiles) {
+            result.put(i, 0);
+        }
+
+        try {
+            resultSet = statement.executeQuery(String.format("SELECT id_profile, offer FROM offers_ambul_%s WHERE id_mo = '%d' AND year = '%d'", name, idMo, YEAR));
+
+            while (resultSet.next())
+                result.replace(resultSet.getInt("id_profile"), resultSet.getInt("offer"));
+
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+        }
+
+        return result;
+
+    }
+
+    public double getValuesByProfilesFromUet(int idMo, String name) {
+
+        double result = 0;
+
+        try {
+            resultSet = statement.executeQuery(String.format("SELECT %s FROM offers_ambul_uet WHERE id_mo = '%d' AND year = '%d'", name, idMo, YEAR));
+
+            while (resultSet.next())
+                result = resultSet.getDouble(String.format("%s", name));
+
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+        }
+
+        return result;
+
+    }
+
+
 
     public HashMap<Integer, Integer> getValuesByProfilesFromSMP(int idMo) {
 

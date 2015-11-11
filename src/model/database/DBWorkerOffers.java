@@ -2,6 +2,7 @@ package model.database;
 
 import model.Constants;
 import model.Constants.OffersTabs;
+import model.ContentTableModel;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -163,7 +164,7 @@ public class DBWorkerOffers {
         numberOfProfile = 0;
         for (int i = 6; i < 37; i++) {
 
-            if (i >= 31 && i<=35)
+            if (i >= 31 && i <= 35)
                 continue;
 
             row = sheet.getRow(i);
@@ -304,10 +305,10 @@ public class DBWorkerOffers {
 
 
         try {
-            resultSet = statement.executeQuery(String.format("SELECT id_profile, hosp FROM offers_hours_24 WHERE id_mo = '%d' AND year = '%d'", idMo, YEAR));
+            resultSet = statement.executeQuery(String.format("SELECT id_profile, offer FROM offers_hours_24 WHERE id_mo = '%d' AND year = '%d'", idMo, YEAR));
 
             while (resultSet.next())
-                result.replace(resultSet.getInt("id_profile"), resultSet.getInt("hosp"));
+                result.replace(resultSet.getInt("id_profile"), resultSet.getInt("offer"));
 
         } catch (SQLException sqle) {
             sqle.printStackTrace();
@@ -329,10 +330,10 @@ public class DBWorkerOffers {
 
 
         try {
-            resultSet = statement.executeQuery(String.format("SELECT id_profile, out_p FROM offers_hours_8 WHERE id_mo = '%d' AND year = '%d'", idMo, YEAR));
+            resultSet = statement.executeQuery(String.format("SELECT id_profile, offer FROM offers_hours_8 WHERE id_mo = '%d' AND year = '%d'", idMo, YEAR));
 
             while (resultSet.next())
-                result.replace(resultSet.getInt("id_profile"), resultSet.getInt("out_p"));
+                result.replace(resultSet.getInt("id_profile"), resultSet.getInt("offer"));
 
         } catch (SQLException sqle) {
             sqle.printStackTrace();
@@ -383,7 +384,6 @@ public class DBWorkerOffers {
     }
 
 
-
     public HashMap<Integer, Integer> getValuesByProfilesFromSMP(int idMo) {
 
         HashMap<Integer, Integer> result = new HashMap<>();
@@ -431,4 +431,102 @@ public class DBWorkerOffers {
         return result;
 
     }
+
+
+    public void saveTableValues(ContentTableModel tableModel) {
+
+        ArrayList<String> queries = new ArrayList<>();
+
+        switch (tableModel.getOffersTabs()) {
+            case HOURS_24:
+                queries = updateDataQueries(tableModel, Constants.planPatHours24);
+                break;
+
+            case HOURS_8:
+                queries = updateDataQueries(tableModel, Constants.planPatHours8);
+                break;
+
+
+
+            case AMBUL_PROF:
+                queries = updateDataQueries(tableModel, Constants.planPatAmbulProf);
+                break;
+            case AMBUL_NEOT:
+            case AMBUL_ZAB:
+                queries = updateDataQueries(tableModel, Constants.planPatAmbulNeot);
+                break;
+            case SMP:
+                queries = updateDataQueries(tableModel, Constants.planPatSmp);
+                break;
+            case OTHER:
+                System.out.println(tableModel.getOffersTabs());
+                break;
+        }
+
+
+        for (String q : queries) {
+            System.out.println(q);
+        }
+    }
+
+    private ArrayList<String> updateDataQueries(ContentTableModel tableModel, int[] profiles) {
+
+        ArrayList<String> queries = new ArrayList<>();
+
+        String tableName = "";
+
+        switch (tableModel.getOffersTabs()) {
+            case HOURS_24:
+                tableName += "hours_24";
+                break;
+            case HOURS_8:
+                tableName += "hours_8";
+                break;
+            case AMBUL_PROF:
+                tableName += "ambul_prof";
+                break;
+            case AMBUL_NEOT:
+                tableName += "ambul_neot";
+                break;
+            case AMBUL_ZAB:
+                tableName += "ambul_zab";
+                break;
+            case SMP:
+                tableName += "smp";
+                break;
+            case OTHER:
+
+
+        }
+
+
+        for (int row = 0; row < tableModel.getRowCount() - 1; row++) {
+            int idMo = new DBWorkerMO().getIdMo((String) tableModel.getValueAt(row, 0));
+
+            for (int column = 1; column <= profiles.length; column++) {
+                queries.add(String.format("UPDATE offers_'%s' SET offer='%d' WHERE id_mo = '%d' AND id_profile='%d'",
+                        tableName, (Integer) tableModel.getValueAt(row, column), idMo, profiles[column - 1]));
+            }
+
+            if (tableModel.getOffersTabs() == OffersTabs.AMBUL_PROF) {
+                queries.add(String.format("UPDATE offers_ambul_uet SET prof='%f' WHERE id_mo = '%d' AND id_profile='%d'",
+                        (Double) tableModel.getValueAt(row, profiles.length+1), idMo, 43));
+            }
+
+            if (tableModel.getOffersTabs() == OffersTabs.AMBUL_NEOT) {
+                queries.add(String.format("UPDATE offers_ambul_uet SET neot='%f' WHERE id_mo = '%d' AND id_profile='%d'",
+                        (Double) tableModel.getValueAt(row, profiles.length+1), idMo, 43));
+            }
+
+            if (tableModel.getOffersTabs() == OffersTabs.AMBUL_ZAB) {
+                queries.add(String.format("UPDATE offers_ambul_uet SET zab='%f' WHERE id_mo = '%d' AND id_profile='%d'",
+                        (Double) tableModel.getValueAt(row, profiles.length+1), idMo, 43));
+            }
+
+        }
+
+        return queries;
+    }
+
+
 }

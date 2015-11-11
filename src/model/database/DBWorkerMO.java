@@ -24,6 +24,20 @@ public class DBWorkerMO {
         return 0;
     }
 
+    public int getIdMo(String name) {
+        try {
+            resultSet = statement.executeQuery(String.format("SELECT id_mo FROM mo_list WHERE name = '%s'", name));
+
+            while (resultSet.next())
+                return resultSet.getInt("id_mo");
+
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+        }
+
+        return 0;
+    }
+
     public ArrayList<Integer> getActiveMos() {
 
         ArrayList<Integer> result= new ArrayList<>();

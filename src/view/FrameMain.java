@@ -10,6 +10,7 @@ public class FrameMain extends JFrame {
     private MyMenuBar mainMenuBar;
     private PanelTreeMenu menuTreePanel;
     private JTabbedPane jTabbedPane;
+//    private JButton tabCloseButton;
 
 
     public FrameMain() throws HeadlessException {
@@ -37,7 +38,9 @@ public class FrameMain extends JFrame {
         menuTreePanel = new PanelTreeMenu();
         jTabbedPane = new JTabbedPane(SwingConstants.TOP, JTabbedPane.SCROLL_TAB_LAYOUT);
 
-        JPanel rightPanel = new JPanel(new MigLayout("","[100%]","[100%]"));
+//        tabCloseButton = new JButton();
+
+        JPanel rightPanel = new JPanel(new MigLayout("", "[100%]", "[100%]"));
         rightPanel.add(jTabbedPane, "width 100%, height 100%");
 
         splitPanel.setLeftComponent(menuTreePanel);
@@ -67,4 +70,8 @@ public class FrameMain extends JFrame {
     public JTabbedPane getjTabbedPane() {
         return jTabbedPane;
     }
+
+//    public JButton getTabCloseButton() {
+//        return tabCloseButton;
+//    }
 }

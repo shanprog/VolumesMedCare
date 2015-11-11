@@ -84,6 +84,10 @@ public class ContentTableModel extends AbstractTableModel {
 
     }
 
+    public OffersTabs getOffersTabs() {
+        return offersTabs;
+    }
+
     private void orgColumnNames() {
         // Организация колонок
         columnNames.add("Название МО");

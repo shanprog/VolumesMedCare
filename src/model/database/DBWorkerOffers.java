@@ -24,7 +24,7 @@ public class DBWorkerOffers {
     private Statement statement = DataBaseConnect.getStatement();
     private ResultSet resultSet;
 
-    private final static int YEAR = 2014;
+    private final static int YEAR = 2015;
 
     HSSFWorkbook wb;
 
@@ -160,6 +160,7 @@ public class DBWorkerOffers {
 
 
         queries.add(String.format("DELETE FROM offers_ambul_neot WHERE id_mo = '%d' AND year='%d';", idMo, YEAR));
+        queries.add(String.format("DELETE FROM offers_ambul_zab WHERE id_mo = '%d' AND year='%d';", idMo, YEAR));
 
         numberOfProfile = 0;
         for (int i = 6; i < 37; i++) {
@@ -185,14 +186,13 @@ public class DBWorkerOffers {
 
         row = sheet.getRow(36);
 
-        double prof_uet = (double) row.getCell(2).getNumericCellValue();
-        double neot_uet = (double) row.getCell(4).getNumericCellValue();
-        double zab_uet = (double) row.getCell(6).getNumericCellValue();
+        double prof_uet = row.getCell(2).getNumericCellValue();
+        double neot_uet = row.getCell(4).getNumericCellValue();
+        double zab_uet = row.getCell(6).getNumericCellValue();
 
         int idprofile = 43;
 
-        queries.add(String.format("INSERT INTO offers_ambul_uet VALUES(NULL, '%d', '%d', '%f', '%f', '%f', '%d');",
-                idMo, idprofile, prof_uet, neot_uet, zab_uet, YEAR));
+        queries.add("INSERT INTO offers_ambul_uet VALUES(NULL, '" + idMo + "', '" + idprofile + "', '" + prof_uet + "', '" + neot_uet + "', '" + zab_uet + "', '" + YEAR + "');");
     }
 
     private void process_smp(int idMo, ArrayList<String> queries) {
@@ -446,27 +446,31 @@ public class DBWorkerOffers {
                 queries = updateDataQueries(tableModel, Constants.planPatHours8);
                 break;
 
-
-
             case AMBUL_PROF:
                 queries = updateDataQueries(tableModel, Constants.planPatAmbulProf);
                 break;
+
             case AMBUL_NEOT:
+
             case AMBUL_ZAB:
                 queries = updateDataQueries(tableModel, Constants.planPatAmbulNeot);
                 break;
+
             case SMP:
                 queries = updateDataQueries(tableModel, Constants.planPatSmp);
                 break;
             case OTHER:
-                System.out.println(tableModel.getOffersTabs());
+
+                queries = updateDataQueries(tableModel, Constants.planPatOther);
                 break;
         }
 
 
-        for (String q : queries) {
-            System.out.println(q);
-        }
+        runQueries(queries);
+
+//        for (String q : queries) {
+//            System.out.println(q);
+//        }
     }
 
     private ArrayList<String> updateDataQueries(ContentTableModel tableModel, int[] profiles) {
@@ -495,7 +499,8 @@ public class DBWorkerOffers {
                 tableName += "smp";
                 break;
             case OTHER:
-
+                tableName += "other";
+                break;
 
         }
 
@@ -503,24 +508,38 @@ public class DBWorkerOffers {
         for (int row = 0; row < tableModel.getRowCount() - 1; row++) {
             int idMo = new DBWorkerMO().getIdMo((String) tableModel.getValueAt(row, 0));
 
-            for (int column = 1; column <= profiles.length; column++) {
-                queries.add(String.format("UPDATE offers_'%s' SET offer='%d' WHERE id_mo = '%d' AND id_profile='%d'",
-                        tableName, (Integer) tableModel.getValueAt(row, column), idMo, profiles[column - 1]));
+            if (tableModel.getOffersTabs() == OffersTabs.OTHER) {
+
+                int counter = 0;
+                for (int column = 1; column < tableModel.getColumnCount() - 1; column++) {
+                    if (column == 3)
+                        continue;
+
+                    queries.add(String.format("UPDATE offers_%s SET offer='%d' WHERE id_mo = '%d' AND id_profile='%d';",
+                            tableName, (Integer) tableModel.getValueAt(row, column), idMo, profiles[counter++]));
+                }
+
+            } else {
+                for (int column = 1; column <= profiles.length; column++) {
+                    queries.add(String.format("UPDATE offers_%s SET offer='%d' WHERE id_mo = '%d' AND id_profile='%d';",
+                            tableName, (Integer) tableModel.getValueAt(row, column), idMo, profiles[column - 1]));
+                }
             }
 
+
             if (tableModel.getOffersTabs() == OffersTabs.AMBUL_PROF) {
-                queries.add(String.format("UPDATE offers_ambul_uet SET prof='%f' WHERE id_mo = '%d' AND id_profile='%d'",
-                        (Double) tableModel.getValueAt(row, profiles.length+1), idMo, 43));
+                queries.add("UPDATE offers_ambul_uet SET prof='" + (Double) tableModel.getValueAt(row, profiles.length + 1) +
+                        "' WHERE id_mo = '" + idMo + "' AND id_profile='43';");
             }
 
             if (tableModel.getOffersTabs() == OffersTabs.AMBUL_NEOT) {
-                queries.add(String.format("UPDATE offers_ambul_uet SET neot='%f' WHERE id_mo = '%d' AND id_profile='%d'",
-                        (Double) tableModel.getValueAt(row, profiles.length+1), idMo, 43));
+                queries.add("UPDATE offers_ambul_uet SET neot='" + (Double) tableModel.getValueAt(row, profiles.length + 1) +
+                        "' WHERE id_mo = '" + idMo + "' AND id_profile='" + 43 + "';");
             }
 
             if (tableModel.getOffersTabs() == OffersTabs.AMBUL_ZAB) {
-                queries.add(String.format("UPDATE offers_ambul_uet SET zab='%f' WHERE id_mo = '%d' AND id_profile='%d'",
-                        (Double) tableModel.getValueAt(row, profiles.length+1), idMo, 43));
+                queries.add("UPDATE offers_ambul_uet SET zab='" + (Double) tableModel.getValueAt(row, profiles.length + 1) +
+                        "' WHERE id_mo = '" + idMo + "' AND id_profile='" + 43 + "';");
             }
 
         }

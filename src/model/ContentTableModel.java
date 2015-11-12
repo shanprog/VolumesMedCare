@@ -6,6 +6,7 @@ import model.database.DBWorkerOffers;
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static model.Constants.*;
@@ -197,12 +198,6 @@ public class ContentTableModel extends AbstractTableModel {
 
                     row.add(sum);
 
-//                    for (int i : Constants.planPatOther) {
-//                        row.add(profilesValues.get(i));
-//                        sum += profilesValues.get(i);
-//                    }
-//                    row.add(sum);
-//                    row.add(sum);
                     break;
             }
 
@@ -211,6 +206,62 @@ public class ContentTableModel extends AbstractTableModel {
 
             data.add(row);
         }
+
+
+        // Добавление строки сумм снизу
+        ArrayList<Object> sumRow = new ArrayList<>();
+
+        sumRow.add("Итого");
+        int to = 0;
+        switch (offersTabs) {
+
+            case HOURS_24:
+            case HOURS_8:
+            case AMBUL_PROF:
+            case AMBUL_NEOT:
+            case AMBUL_ZAB:
+                to = getColumnCount() - 1;
+                break;
+            case SMP:
+            case OTHER:
+                to = getColumnCount();
+                break;
+        }
+
+
+        for (int i = 1; i < to; i++) {
+
+            if (
+                    (offersTabs == OffersTabs.AMBUL_PROF ||
+                            offersTabs == OffersTabs.AMBUL_NEOT ||
+                            offersTabs == OffersTabs.AMBUL_ZAB)
+                            && i == getColumnCount() - 3
+                    ) {
+
+                double sum = 0;
+                for (int j = 0; j < getRowCount(); j ++) {
+                    sum += (Double) getValueAt(j, i);
+                }
+
+                sumRow.add(sum);
+
+            }
+            else {
+                int sum = 0;
+                for (int j = 0; j < getRowCount(); j ++) {
+                    sum += (Integer) getValueAt(j, i);
+                }
+
+                sumRow.add(sum);
+            }
+
+        }
+
+        if (offersTabs != OffersTabs.OTHER || offersTabs != OffersTabs.SMP) {
+            sumRow.add("Итого");
+        }
+
+        data.add(sumRow);
 
 
     }

@@ -66,8 +66,9 @@ public class DBWorkerOffers {
         } catch (IOException ioException) {
             JOptionPane.showMessageDialog(null, "Файл не может быть прочитан. " + ioException.toString());
         } catch (Exception e) {
-            System.out.println(file.getName());
-            e.printStackTrace();
+//            System.out.println(file.getName());
+//            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Файл " + file.getName() + " не загрузился.");
             return false;
         }
 

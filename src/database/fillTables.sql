@@ -180,6 +180,7 @@ INSERT INTO roles VALUES
   (NULL, 'Администратор'),
   (NULL, 'Пользователь');
 
-INSERT IGNORE INTO users VALUES
+INSERT INTO users VALUES
   (NULL, 'Administrator', '35dba5d75538a9bbe0b4da4422759a0e','Администратор', 1, 1),
-  (NULL, 'User1', '35dba5d75538a9bbe0b4da4422759a0e','Пользователь', 2, 1);
+  (NULL, 'Саяпина', 'b97c72702f44c66c2de2ecdfe321705f','Пользователь', 2, 1),
+  (NULL, 'Аргучинцева', 'b97c72702f44c66c2de2ecdfe321705f','Пользователь', 2, 1);

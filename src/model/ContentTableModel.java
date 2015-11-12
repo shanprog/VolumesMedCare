@@ -6,7 +6,6 @@ import model.database.DBWorkerOffers;
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static model.Constants.*;
@@ -239,16 +238,15 @@ public class ContentTableModel extends AbstractTableModel {
                     ) {
 
                 double sum = 0;
-                for (int j = 0; j < getRowCount(); j ++) {
+                for (int j = 0; j < getRowCount(); j++) {
                     sum += (Double) getValueAt(j, i);
                 }
 
                 sumRow.add(sum);
 
-            }
-            else {
+            } else {
                 int sum = 0;
-                for (int j = 0; j < getRowCount(); j ++) {
+                for (int j = 0; j < getRowCount(); j++) {
                     sum += (Integer) getValueAt(j, i);
                 }
 
@@ -327,6 +325,7 @@ public class ContentTableModel extends AbstractTableModel {
 
                     data.get(rowIndex).set(columnIndex, sum);
                 }
+
 
                 fireTableRowsUpdated(rowIndex, rowIndex);
 
@@ -487,7 +486,47 @@ public class ContentTableModel extends AbstractTableModel {
                 break;
         }
 
+        if (getColumnClass(columnIndex).equals(Double.class)) {
+            data.get(getRowCount() - 1).set(columnIndex, getColumnSum(columnIndex));
+        } else if (getColumnClass(columnIndex).equals(Integer.class)) {
+            data.get(getRowCount() - 1).set(columnIndex, (int) getColumnSum(columnIndex));
+        }
+
+        switch (offersTabs) {
+            case HOURS_24:
+            case HOURS_8:
+            case AMBUL_PROF:
+            case AMBUL_NEOT:
+            case AMBUL_ZAB:
+                data.get(getRowCount() - 1).set(getColumnCount() - 2, (int) getColumnSum(getColumnCount() - 2));
+                break;
+            case SMP:
+            case OTHER:
+                data.get(getRowCount() - 1).set(getColumnCount() - 1, (int) getColumnSum(getColumnCount() - 1));
+                break;
+        }
+
+        fireTableRowsUpdated(getRowCount() - 1, getRowCount() - 1);
+
     }
+
+    private double getColumnSum(int col) {
+
+        double res = 0;
+
+        for (int i = 0; i < getRowCount() - 1; i++) {
+
+            if (getColumnClass(col).equals(Integer.class)) {
+                res += (double) (Integer) getValueAt(i, col);
+            } else if (getColumnClass(col).equals(Double.class)) {
+                res += (Double) getValueAt(i, col);
+            }
+
+        }
+
+        return res;
+    }
+
 
     @Override
     public boolean isCellEditable(int rowIndex, int columnIndex) {

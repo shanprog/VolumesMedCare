@@ -23,6 +23,8 @@ public class FrameLoginController {
 
             String login = frameLogin.getLogin();
 
+//            System.out.println(DigestUtils.md5Hex(Arrays.toString(frameLogin.getPassword())).toCharArray());
+
             try {
                 if (dbWorkerUser.userIsExist(login)) {
 

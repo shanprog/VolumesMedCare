@@ -12,9 +12,11 @@ public class DataBaseConnect {
     private DataBaseConnect() {
 
         try {
-            String url = "jdbc:mysql://localhost:3306/vol_med_care";
             String userName = "AdminMedCare";
-            String password = "Nof7LE";
+            String url = "jdbc:mysql://192.168.1.11:3307/vol_med_care";
+            String password = "4E8edI1E";
+//            String url = "jdbc:mysql://localhost:3306/vol_med_care";
+//            String password = "Nof7LE";
             Class.forName("com.mysql.jdbc.Driver").newInstance();
 
             Connection connection = DriverManager.getConnection(url, userName, password);

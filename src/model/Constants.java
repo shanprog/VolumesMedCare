@@ -8,6 +8,30 @@ public class Constants {
         HOURS_24, HOURS_8, AMBUL_PROF, AMBUL_NEOT, AMBUL_ZAB, SMP, OTHER;
 
 
+        public static OffersTabs toOffersTabsElement(String name) {
+
+            switch (name) {
+                case "Кругл.суточ. стационар":
+                    return HOURS_24;
+                case "Днев. стационар":
+                    return HOURS_8;
+                case "Амбул.проф.":
+                    return AMBUL_PROF;
+                case "Амбул.неот.":
+                    return AMBUL_NEOT;
+                case "Амбул.заб.":
+                    return AMBUL_ZAB;
+                case "Скорая мед. помощь":
+                    return SMP;
+                case "Прочие виды":
+                    return OTHER;
+
+            }
+
+            return null;
+        }
+
+
         @Override
         public String toString() {
 

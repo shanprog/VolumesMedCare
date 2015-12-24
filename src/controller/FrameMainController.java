@@ -28,6 +28,7 @@ public class FrameMainController {
 
         frameMain.getMainMenuBar().setItemExitAction(e -> frameMain.getFrame().dispose());
         frameMain.getMainMenuBar().setItemLoadAction(e -> new FrameLoadController());
+        frameMain.getMainMenuBar().setItemOffersOutXlsAction(e -> new FrameOffersOutXlsController());
 
         frameMain.getMenuTreePanel().setMouseListener(new NodeMouseListener(frameMain.getMenuTreePanel().getTree()));
 

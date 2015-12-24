@@ -15,8 +15,6 @@ public class ContentTablePanel extends JPanel {
 
     public ContentTablePanel() {
 
-
-
         setLayout(new MigLayout("", "[100%]", "[100%]"));
 
         save = new JButton("Сохранить");

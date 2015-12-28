@@ -302,16 +302,22 @@ public class ContentTableModel extends AbstractTableModel {
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
 
         int colCount = getColumnCount();
-        int oldSum;
+        int oldSum = 0;
         int oldSumWithoutStom = 0;
 
-        if (offersTabs == OffersTabs.SMP || offersTabs == OffersTabs.OTHER)
-            oldSum = (Integer) (data.get(rowIndex)).get(colCount - 1);
-        else if (offersTabs == OffersTabs.HOURS_24 || offersTabs == OffersTabs.HOURS_8)
-            oldSum = (Integer) (data.get(rowIndex)).get(colCount - 2);
-        else {
-            oldSum = (Integer) (data.get(rowIndex)).get(colCount - 2);
-            oldSumWithoutStom = (Integer) (data.get(rowIndex)).get(colCount - 4);
+        if (offersTabs == OffersTabs.SMP || offersTabs == OffersTabs.OTHER) {
+            if ((data.get(rowIndex)).get(colCount - 1) != null)
+                oldSum = (Integer) (data.get(rowIndex)).get(colCount - 1);
+        } else if (offersTabs == OffersTabs.HOURS_24 || offersTabs == OffersTabs.HOURS_8) {
+            if ((data.get(rowIndex)).get(colCount - 2) != null)
+                oldSum = (Integer) (data.get(rowIndex)).get(colCount - 2);
+        } else {
+
+            if ((data.get(rowIndex)).get(colCount - 2) != null)
+                oldSum = (Integer) (data.get(rowIndex)).get(colCount - 2);
+
+            if ((data.get(rowIndex)).get(colCount - 4) != null)
+                oldSumWithoutStom = (Integer) (data.get(rowIndex)).get(colCount - 4);
         }
 
 
@@ -586,17 +592,66 @@ public class ContentTableModel extends AbstractTableModel {
 
         switch (offersTabs) {
             case HOURS_24:
-            case HOURS_8:
-            case AMBUL_PROF:
-            case AMBUL_NEOT:
-            case AMBUL_ZAB:
+
+                if (columnIndex == getColumnCount() - 2) {
+                    for (int i = 0; i < planPatHours24.length; i++) {
+                        data.get(getRowCount() - 1).set(i + 1, (int) getColumnSum(i + 1));
+                    }
+                }
+
                 data.get(getRowCount() - 1).set(getColumnCount() - 2, (int) getColumnSum(getColumnCount() - 2));
                 break;
+            case HOURS_8:
+                if (columnIndex == getColumnCount() - 2) {
+                    for (int i = 0; i < planPatHours8.length; i++) {
+                        data.get(getRowCount() - 1).set(i + 1, (int) getColumnSum(i + 1));
+                    }
+                }
+
+                data.get(getRowCount() - 1).set(getColumnCount() - 2, (int) getColumnSum(getColumnCount() - 2));
+                break;
+            case AMBUL_PROF:
+
+                if (columnIndex == getColumnCount() - 2 || columnIndex == getColumnCount() - 4) {
+                    for (int i = 0; i < planPatAmbulProf.length; i++) {
+                        data.get(getRowCount() - 1).set(i + 1, (int) getColumnSum(i + 1));
+                    }
+                }
+
+                data.get(getRowCount() - 1).set(getColumnCount() - 2, (int) getColumnSum(getColumnCount() - 2));
+                data.get(getRowCount() - 1).set(getColumnCount() - 4, (int) getColumnSum(getColumnCount() - 4));
+                break;
+            case AMBUL_NEOT:
+            case AMBUL_ZAB:
+
+                if (columnIndex == getColumnCount() - 2 || columnIndex == getColumnCount() - 4) {
+                    for (int i = 0; i < planPatAmbulNeot.length; i++) {
+                        data.get(getRowCount() - 1).set(i + 1, (int) getColumnSum(i + 1));
+                    }
+                }
+
+                data.get(getRowCount() - 1).set(getColumnCount() - 2, (int) getColumnSum(getColumnCount() - 2));
+                data.get(getRowCount() - 1).set(getColumnCount() - 4, (int) getColumnSum(getColumnCount() - 4));
+                break;
             case SMP:
+                if (columnIndex == getColumnCount() - 1) {
+                    for (int i = 0; i < planPatSmp.length; i++) {
+                        data.get(getRowCount() - 1).set(i + 1, (int) getColumnSum(i + 1));
+                    }
+                }
+
+                data.get(getRowCount() - 1).set(getColumnCount() - 1, (int) getColumnSum(getColumnCount() - 1));
+                break;
             case OTHER:
+                if (columnIndex == getColumnCount() - 1) {
+                    for (int i = 0; i < planPatOther.length; i++) {
+                        data.get(getRowCount() - 1).set(i + 1, (int) getColumnSum(i + 1));
+                    }
+                }
                 data.get(getRowCount() - 1).set(getColumnCount() - 1, (int) getColumnSum(getColumnCount() - 1));
                 break;
         }
+
 
         fireTableRowsUpdated(getRowCount() - 1, getRowCount() - 1);
 
@@ -609,7 +664,7 @@ public class ContentTableModel extends AbstractTableModel {
         for (int i = 0; i < getRowCount() - 1; i++) {
 
             if (getColumnClass(col).equals(Integer.class)) {
-                res += (double) (Integer) getValueAt(i, col);
+                res += (Integer) getValueAt(i, col);
             } else if (getColumnClass(col).equals(Double.class)) {
                 res += (Double) getValueAt(i, col);
             }
@@ -692,7 +747,6 @@ public class ContentTableModel extends AbstractTableModel {
         return Object.class;
 
     }
-
 
 
 }

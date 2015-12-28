@@ -529,17 +529,17 @@ public class DBWorkerOffers {
 
 
             if (tableModel.getOffersTabs() == OffersTabs.AMBUL_PROF) {
-                queries.add("UPDATE offers_ambul_uet SET prof='" + (Double) tableModel.getValueAt(row, profiles.length + 1) +
+                queries.add("UPDATE offers_ambul_uet SET prof='" + (Double) tableModel.getValueAt(row, profiles.length + 2) +
                         "' WHERE id_mo = '" + idMo + "' AND id_profile='43';");
             }
 
             if (tableModel.getOffersTabs() == OffersTabs.AMBUL_NEOT) {
-                queries.add("UPDATE offers_ambul_uet SET neot='" + (Double) tableModel.getValueAt(row, profiles.length + 1) +
+                queries.add("UPDATE offers_ambul_uet SET neot='" + (Double) tableModel.getValueAt(row, profiles.length + 2) +
                         "' WHERE id_mo = '" + idMo + "' AND id_profile='" + 43 + "';");
             }
 
             if (tableModel.getOffersTabs() == OffersTabs.AMBUL_ZAB) {
-                queries.add("UPDATE offers_ambul_uet SET zab='" + (Double) tableModel.getValueAt(row, profiles.length + 1) +
+                queries.add("UPDATE offers_ambul_uet SET zab='" + (Double) tableModel.getValueAt(row, profiles.length + 2) +
                         "' WHERE id_mo = '" + idMo + "' AND id_profile='" + 43 + "';");
             }
 

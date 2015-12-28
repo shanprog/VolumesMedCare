@@ -46,6 +46,7 @@ public class ContentTableModel extends AbstractTableModel {
             case AMBUL_ZAB:
                 orgColumnNames();
 
+                columnNames.add("Итого -стоматология");
                 columnNames.add("УЕТ");
                 columnNames.add("Итого");
                 columnNames.add("Название МО");
@@ -74,13 +75,8 @@ public class ContentTableModel extends AbstractTableModel {
                 columnNames.add("Итого");
 
                 orgRows();
-
-
                 break;
-
-
         }
-
 
     }
 
@@ -110,6 +106,8 @@ public class ContentTableModel extends AbstractTableModel {
             HashMap<Integer, Integer> profilesValues;
 
             int sum = 0;
+            int sumWithoutStom = 0;
+
             switch (offersTabs) {
                 case HOURS_24:
                     profilesValues = dbWorkerOffers.getValuesByProfilesFromHours24(idMo);
@@ -137,6 +135,11 @@ public class ContentTableModel extends AbstractTableModel {
                         sum += profilesValues.get(i);
                     }
 
+                    for (int i = 0; i < Constants.planPatAmbulProf.length - 1; i++) {
+                        sumWithoutStom += profilesValues.get(Constants.planPatAmbulProf[i]);
+                    }
+
+                    row.add(sumWithoutStom);
                     row.add(dbWorkerOffers.getValuesByProfilesFromUet(idMo, "prof"));
                     row.add(sum);
 
@@ -150,6 +153,11 @@ public class ContentTableModel extends AbstractTableModel {
                         sum += profilesValues.get(i);
                     }
 
+                    for (int i = 0; i < Constants.planPatAmbulNeot.length - 1; i++) {
+                        sumWithoutStom += profilesValues.get(Constants.planPatAmbulNeot[i]);
+                    }
+
+                    row.add(sumWithoutStom);
                     row.add(dbWorkerOffers.getValuesByProfilesFromUet(idMo, "neot"));
                     row.add(sum);
 
@@ -163,6 +171,11 @@ public class ContentTableModel extends AbstractTableModel {
                         sum += profilesValues.get(i);
                     }
 
+                    for (int i = 0; i < Constants.planPatAmbulNeot.length - 1; i++) {
+                        sumWithoutStom += profilesValues.get(Constants.planPatAmbulNeot[i]);
+                    }
+
+                    row.add(sumWithoutStom);
                     row.add(dbWorkerOffers.getValuesByProfilesFromUet(idMo, "zab"));
                     row.add(sum);
 
@@ -290,11 +303,16 @@ public class ContentTableModel extends AbstractTableModel {
 
         int colCount = getColumnCount();
         int oldSum;
+        int oldSumWithoutStom = 0;
 
         if (offersTabs == OffersTabs.SMP || offersTabs == OffersTabs.OTHER)
             oldSum = (Integer) (data.get(rowIndex)).get(colCount - 1);
-        else
+        else if (offersTabs == OffersTabs.HOURS_24 || offersTabs == OffersTabs.HOURS_8)
             oldSum = (Integer) (data.get(rowIndex)).get(colCount - 2);
+        else {
+            oldSum = (Integer) (data.get(rowIndex)).get(colCount - 2);
+            oldSumWithoutStom = (Integer) (data.get(rowIndex)).get(colCount - 4);
+        }
 
 
         data.get(rowIndex).set(columnIndex, aValue);
@@ -361,30 +379,67 @@ public class ContentTableModel extends AbstractTableModel {
                 break;
             case AMBUL_PROF:
 
-                if (columnIndex > 0 && columnIndex < colCount - 3) {
+                if (columnIndex > 0 && columnIndex < colCount - 4) {
+
                     int sum = 0;
+                    int sumWithoutStom = 0;
+
                     for (int i = 0; i < planPatAmbulProf.length; i++) {
                         sum += (Integer) (data.get(rowIndex)).get(i + 1);
                     }
 
+                    for (int i = 0; i < planPatAmbulProf.length - 1; i++) {
+                        sumWithoutStom += (Integer) (data.get(rowIndex)).get(i + 1);
+                    }
+
+                    data.get(rowIndex).set(colCount - 2, sum);
+                    data.get(rowIndex).set(colCount - 4, sumWithoutStom);
+                }
+
+
+                if (columnIndex == colCount - 4) {
+
+                    double k = ((Integer) (data.get(rowIndex)).get(columnIndex)) / ((double) oldSumWithoutStom);
+
+                    int sum = 0;
+                    int sumWithoutStom = 0;
+
+                    for (int i = 0; i < planPatAmbulProf.length - 1; i++) {
+                        int newVal = (int) ((Integer) (data.get(rowIndex)).get(i + 1) * k);
+                        data.get(rowIndex).set(i + 1, newVal);
+
+                        sumWithoutStom += newVal;
+                        sum += newVal;
+                    }
+
+                    sum += ((Integer) (data.get(rowIndex)).get(planPatAmbulProf.length));
+
+                    data.get(rowIndex).set(columnIndex, sumWithoutStom);
                     data.get(rowIndex).set(colCount - 2, sum);
                 }
 
 
                 if (columnIndex == colCount - 2) {
 
-                    double k = ((Integer) (data.get(rowIndex)).get(colCount - 2)) / ((double) oldSum);
+                    double k = ((Integer) (data.get(rowIndex)).get(columnIndex)) / ((double) oldSum);
 
                     int sum = 0;
+                    int sumWithoutStom = 0;
+
                     for (int i = 0; i < planPatAmbulProf.length; i++) {
                         int newVal = (int) ((Integer) (data.get(rowIndex)).get(i + 1) * k);
                         data.get(rowIndex).set(i + 1, newVal);
 
                         sum += newVal;
+                        sumWithoutStom += newVal;
                     }
 
+                    sumWithoutStom -= ((Integer) (data.get(rowIndex)).get(planPatAmbulProf.length));
+
                     data.get(rowIndex).set(columnIndex, sum);
+                    data.get(rowIndex).set(colCount - 4, sumWithoutStom);
                 }
+
 
                 fireTableRowsUpdated(rowIndex, rowIndex);
                 break;
@@ -392,28 +447,67 @@ public class ContentTableModel extends AbstractTableModel {
             case AMBUL_NEOT:
             case AMBUL_ZAB:
 
-                if (columnIndex > 0 && columnIndex < colCount - 3) {
+                if (columnIndex > 0 && columnIndex < colCount - 4) {
+
                     int sum = 0;
+                    int sumWithoutStom = 0;
+
                     for (int i = 0; i < planPatAmbulNeot.length; i++) {
                         sum += (Integer) (data.get(rowIndex)).get(i + 1);
                     }
 
+                    for (int i = 0; i < planPatAmbulNeot.length-1; i++) {
+                        sumWithoutStom += (Integer) (data.get(rowIndex)).get(i + 1);
+                    }
+
+                    data.get(rowIndex).set(colCount - 2, sum);
+                    data.get(rowIndex).set(colCount - 4, sumWithoutStom);
+                }
+
+
+
+
+                if (columnIndex == colCount - 4) {
+
+                    double k = ((Integer) (data.get(rowIndex)).get(columnIndex)) / ((double) oldSumWithoutStom);
+
+                    int sum = 0;
+                    int sumWithoutStom = 0;
+
+                    for (int i = 0; i < planPatAmbulNeot.length - 1; i++) {
+                        int newVal = (int) ((Integer) (data.get(rowIndex)).get(i + 1) * k);
+                        data.get(rowIndex).set(i + 1, newVal);
+
+                        sumWithoutStom += newVal;
+                        sum += newVal;
+                    }
+
+                    sum += ((Integer) (data.get(rowIndex)).get(planPatAmbulNeot.length));
+
+                    data.get(rowIndex).set(columnIndex, sumWithoutStom);
                     data.get(rowIndex).set(colCount - 2, sum);
                 }
 
+
                 if (columnIndex == colCount - 2) {
 
-                    double k = ((Integer) (data.get(rowIndex)).get(colCount - 2)) / ((double) oldSum);
+                    double k = ((Integer) (data.get(rowIndex)).get(columnIndex)) / ((double) oldSum);
 
                     int sum = 0;
+                    int sumWithoutStom = 0;
+
                     for (int i = 0; i < planPatAmbulNeot.length; i++) {
                         int newVal = (int) ((Integer) (data.get(rowIndex)).get(i + 1) * k);
                         data.get(rowIndex).set(i + 1, newVal);
 
                         sum += newVal;
+                        sumWithoutStom += newVal;
                     }
 
+                    sumWithoutStom -= ((Integer) (data.get(rowIndex)).get(planPatAmbulNeot.length));
+
                     data.get(rowIndex).set(columnIndex, sum);
+                    data.get(rowIndex).set(colCount - 4, sumWithoutStom);
                 }
 
                 fireTableRowsUpdated(rowIndex, rowIndex);

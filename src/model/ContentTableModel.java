@@ -456,15 +456,13 @@ public class ContentTableModel extends AbstractTableModel {
                         sum += (Integer) (data.get(rowIndex)).get(i + 1);
                     }
 
-                    for (int i = 0; i < planPatAmbulNeot.length-1; i++) {
+                    for (int i = 0; i < planPatAmbulNeot.length - 1; i++) {
                         sumWithoutStom += (Integer) (data.get(rowIndex)).get(i + 1);
                     }
 
                     data.get(rowIndex).set(colCount - 2, sum);
                     data.get(rowIndex).set(colCount - 4, sumWithoutStom);
                 }
-
-
 
 
                 if (columnIndex == colCount - 4) {
@@ -694,4 +692,7 @@ public class ContentTableModel extends AbstractTableModel {
         return Object.class;
 
     }
+
+
+
 }

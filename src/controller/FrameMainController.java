@@ -8,8 +8,10 @@ import view.ContentTablePanel;
 import view.FrameMain;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -68,6 +70,9 @@ public class FrameMainController {
 
                             contentTablePanel.setTableModel(tableModel);
 
+                            setColumnColors(contentTablePanel.getTable(), (Constants.OffersTabs) node.getUserObject());
+
+
                             frameMain.getjTabbedPane().add(node.toString(), contentTablePanel);
 
                             openTabs.add(path);
@@ -91,6 +96,35 @@ public class FrameMainController {
                 }
 
             }
+        }
+
+        private void setColumnColors(JTable table, Constants.OffersTabs offersTabs) {
+
+
+            DefaultTableCellRenderer defaultTableCellRenderer = new DefaultTableCellRenderer();
+            defaultTableCellRenderer.setBackground(Color.LIGHT_GRAY);
+
+            table.getColumnModel().getColumn(0).setCellRenderer(defaultTableCellRenderer);
+
+            switch (offersTabs) {
+                case HOURS_24:
+                case HOURS_8:
+                    table.getColumnModel().getColumn(table.getColumnCount() - 1).setCellRenderer(defaultTableCellRenderer);
+                    table.getColumnModel().getColumn(table.getColumnCount() - 2).setCellRenderer(defaultTableCellRenderer);
+                    break;
+                case AMBUL_NEOT:
+                case AMBUL_PROF:
+                case AMBUL_ZAB:
+                    table.getColumnModel().getColumn(table.getColumnCount() - 1).setCellRenderer(defaultTableCellRenderer);
+                    table.getColumnModel().getColumn(table.getColumnCount() - 2).setCellRenderer(defaultTableCellRenderer);
+                    table.getColumnModel().getColumn(table.getColumnCount() - 4).setCellRenderer(defaultTableCellRenderer);
+                    break;
+                case SMP:
+                case OTHER:
+                    table.getColumnModel().getColumn(table.getColumnCount() - 1).setCellRenderer(defaultTableCellRenderer);
+                    break;
+            }
+
         }
 
     }

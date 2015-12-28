@@ -4,16 +4,20 @@ import model.Constants;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableModel;
+import java.awt.*;
 import java.awt.event.ActionListener;
 
 public class ContentTablePanel extends JPanel {
 
     private JTable table;
     private JButton save;
-
+    private Constants.OffersTabs offersTabs;
 
     public ContentTablePanel() {
+
+        this.offersTabs = offersTabs;
 
         setLayout(new MigLayout("", "[100%]", "[100%]"));
 

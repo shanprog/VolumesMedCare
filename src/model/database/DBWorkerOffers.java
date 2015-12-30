@@ -57,9 +57,9 @@ public class DBWorkerOffers {
             process_smp(idMo, queries);
             process_other(idMo, queries);
 
-//            for (String q : queries) {
-//                System.out.println(q);
-//            }
+            for (String q : queries) {
+                System.out.println(q);
+            }
 
             runQueries(queries);
 
@@ -459,6 +459,7 @@ public class DBWorkerOffers {
 
             case SMP:
                 queries = updateDataQueries(tableModel, Constants.planPatSmp);
+
                 break;
             case OTHER:
 
@@ -516,14 +517,14 @@ public class DBWorkerOffers {
                     if (column == 3)
                         continue;
 
-                    queries.add(String.format("UPDATE offers_%s SET offer='%d' WHERE id_mo = '%d' AND id_profile='%d';",
-                            tableName, (Integer) tableModel.getValueAt(row, column), idMo, profiles[counter++]));
+                    queries.add(String.format("UPDATE offers_%s SET offer='%d' WHERE id_mo = '%d' AND id_profile='%d' AND year = '%d';",
+                            tableName, (Integer) tableModel.getValueAt(row, column), idMo, profiles[counter++], YEAR));
                 }
 
             } else {
                 for (int column = 1; column <= profiles.length; column++) {
-                    queries.add(String.format("UPDATE offers_%s SET offer='%d' WHERE id_mo = '%d' AND id_profile='%d';",
-                            tableName, (Integer) tableModel.getValueAt(row, column), idMo, profiles[column - 1]));
+                    queries.add(String.format("UPDATE offers_%s SET offer='%d' WHERE id_mo = '%d' AND id_profile='%d' AND year = '%d';",
+                            tableName, (Integer) tableModel.getValueAt(row, column), idMo, profiles[column - 1],YEAR));
                 }
             }
 

@@ -13,11 +13,8 @@ public class ContentTablePanel extends JPanel {
 
     private JTable table;
     private JButton save;
-    private Constants.OffersTabs offersTabs;
 
     public ContentTablePanel() {
-
-        this.offersTabs = offersTabs;
 
         setLayout(new MigLayout("", "[100%]", "[100%]"));
 

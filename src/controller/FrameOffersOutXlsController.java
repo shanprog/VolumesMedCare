@@ -86,6 +86,9 @@ public class FrameOffersOutXlsController {
                 out.close();
 
             } catch (IOException e1) {
+
+                JOptionPane.showMessageDialog(frameOut, "Ошибка, файл используется", "Ошибка!", JOptionPane.ERROR_MESSAGE);
+
                 e1.printStackTrace();
             }
 
